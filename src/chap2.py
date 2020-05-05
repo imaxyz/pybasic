@@ -17,7 +17,7 @@ for n in range(10):
           '8進数:{0:0o}, '
           '16進数:{0:0x}'.format(n))
 
-# Pythonにおける浮動小数点の精度の問題
+# Pythonにおける浮動小数点の精度の問題の確認
 print(1 / 3)
 print(7 / 3)
 
@@ -25,4 +25,9 @@ print(7 / 3)
 print('left', 'right', sep='|')
 
 for i in range(5):
+    # print()の後に挿入する文字を、スペースに変更する。
     print(i, end=' ')
+
+# ファイルを開いて、ファイルにprint()で出力する
+with open('chp2-2.txt', 'at') as fp:
+    print('Hello, world!', file=fp)
