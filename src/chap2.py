@@ -18,8 +18,8 @@ for n in range(10):
           '16進数:{0:0x}'.format(n))
 
 # Pythonにおける浮動小数点の精度の問題
-print(1/3)
-print(7/3)
+print(1 / 3)
+print(7 / 3)
 
 # print()の演習
 print('left', 'right', sep='|')
