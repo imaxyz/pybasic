@@ -4,11 +4,15 @@ print(sys.version)
 
 filename = 'src/sample.txt'
 
-with open(filename, 'rt', encoding='utf-8') as fp:
-    # fp.write('This is sample.')
-    # fp = open(filename, 'rt')
-    fp.read()
-    # fp.readline()
+try:
+    with open(filename, 'rt', encoding='utf-8') as fp:
+        # fp.write('This is sample.')
+        # fp = open(filename, 'rt')
+        fp.read()
+        # fp.readline()
+        pass
+except Exception as e:
+    print(e)
 
 for n in range(10):
     print('10進数: {0:d}, '
@@ -31,3 +35,18 @@ for i in range(5):
 # ファイルを開いて、ファイルにprint()で出力する
 with open('chp2-2.txt', 'at') as fp:
     print('Hello, world!', file=fp)
+
+# 例外の補足
+try:
+    filename2 = 'wrong-hoge.txt'
+    with open(filename2, 'rt', encoding='utf-8') as fp:
+        any_str = fp.read()
+        print('any: {0}'.format(any_str))
+
+except OSError as e:
+    print(e)
+except Exception as e:
+    print(e)
+finally:
+    print('finally: {0}'.format(filename2))
+    pass
