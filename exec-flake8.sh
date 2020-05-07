@@ -1,4 +1,4 @@
 #!/bin/sh
 
-flake8 src/* --exclude src/*.txt
+flake8 src/* --exclude data
 
