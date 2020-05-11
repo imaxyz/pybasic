@@ -2,5 +2,7 @@ autopep8==1.5.2
 entrypoints==0.3
 flake8==3.7.9
 mccabe==0.6.1
+numpy==1.18.4
 pycodestyle==2.5.0
+pycrypto==2.6.1
 pyflakes==2.1.1

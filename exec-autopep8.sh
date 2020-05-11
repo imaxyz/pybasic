@@ -1,4 +1,4 @@
 #!/bin/sh
 
-autopep8 --in-place --aggressive --aggressive src/*
+autopep8 --in-place --aggressive --recursive src
 
