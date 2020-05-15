@@ -92,16 +92,69 @@ def execute_basic_python_functons():
     print('dict() + zip(): ', dict(zip(meallist, drinklist)))
 
 
+# global変数を定義
+greeting = 'Good Morning'
+
 # Python特有の応用機能
+
+
 def execute_python_app_functions():
     # 無名関数を作る
-    double_value = lambda x: x * 2
-    result = double_value(2)
+    def double_value(x):
+        x = x * 2
+        return x
+
+    print('double_value: ', double_value(2))
+
+    # 無名関数を用いてそーとする
+    month_name = [(1, 'January'), (2, 'February'), (3, 'March')]
+    month_name.sort(key=lambda x: x[1])
+    print('month_name: ', month_name)
+
+    # 任意引数を持つ関数を定義
+    def variable_args(first, *args):
+        print('variable_args: ', args)
+
+    variable_args(1, 2, 3, 4, 5, 6, 66, 7)
+
+    # ここで定義する変数は、global変数では無い。関数内スコープ変数。
+    # greeting = 'Good Morning'
+
+    def afternoon():
+        # グローバル変数 greetingを関数内で使用
+        global greeting
+        greeting = 'Hello'
+        print(greeting)
+
+    afternoon()
+    print(greeting)
+
+    # Pythonで関数を実行するときは、「参照渡し」になる。（＝元の値が変更される）
+    # しかしながら、数値/文字列に関しては「値渡し」になる（＝元の値は変更されない）
+    # (!) Pythonでは、数値/文字列は、Immutableな存在。
+    #   値を変更するときは、同じ変数が、新しい値の保管場所を参照するようになる。
+    x = 1
+    y = double_value(x)
+    print('x, y:', x, y)
+
+    # (!) Pythonでは、リスト/辞書は、mutableな存在。
+    #   値を変更するときは、同じ変数が、同じ値の保管場所を参照する。
+    def modify_list(original: list):
+        original[1] = 'Apple'
+
+    vegetables = ['Carrot', 'Potato', 'Pampkin']
+    modify_list(vegetables)
+    print('vegetables:', vegetables)
+
+    # 浅いコピー
+
+
     pass
 
 
 def main():
     execute_basic_python_functons()
+    print('------------------------------')
     execute_python_app_functions()
 
 
