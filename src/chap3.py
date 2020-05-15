@@ -92,17 +92,10 @@ def execute_basic_python_functons():
     print('dict() + zip(): ', dict(zip(meallist, drinklist)))
 
 
-# Python特有の応用機能
-def execute_python_app_functions():
-    # 無名関数を作る
-    double_value = lambda x: x * 2
-    result = double_value(2)
-    pass
 
 
 def main():
     execute_basic_python_functons()
-    execute_python_app_functions()
 
 
 if __name__ == '__main__':
