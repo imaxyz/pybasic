@@ -1,19 +1,29 @@
-def sum_elements(digitlist: list):
-    """
-    パラメータの数字要素を合算して返す
+def wrap_comments(func):
+    def wrapper(*args, **kwargs):
+        print(f'---- start   {func.__name__} -----')
+        func(*args, **kwargs)
+        print(f'\n---- end   {func.__name__} -----')
 
-    :param digitlist: 数字を含むリスト
-    :return:
-    """
-    sum_digit = 0
-    for digit in digitlist:
-        if digit.isdigit():
-            sum_digit += int(digit)
-
-    return sum_digit
+    return wrapper
 
 
+@wrap_comments
 def execute_basic_python_functons():
+
+    def sum_elements(digitlist: list):
+        """
+        パラメータの数字要素を合算して返す
+
+        :param digitlist: 数字を含むリスト
+        :return:
+        """
+        sum_digit = 0
+        for digit in digitlist:
+            if digit.isdigit():
+                sum_digit += int(digit)
+
+        return sum_digit
+
     # 数字要素を合算する
     digitlist = ['1', '4', 'abc']
     sum_digit = sum_elements(digitlist)
@@ -98,6 +108,7 @@ greeting = 'Good Morning'
 # Python特有の応用機能
 
 
+@wrap_comments
 def execute_python_app_functions():
     # 無名関数を作る
     def double_value(x):
@@ -146,16 +157,71 @@ def execute_python_app_functions():
     modify_list(vegetables)
     print('vegetables:', vegetables)
 
-    # 浅いコピー
+    pass
 
 
+@wrap_comments
+def execute_copy_function_demo():
+    import copy
+
+    # mutableなデータ型において単純な代入文を使うと同じ場所を指す
+    list_a = [1, 2, 3]
+    list_b = list_a
+    list_b[1] = 100  # list_bに行った変更は、list_aにも及ぶ
+    print('[1] list_a:', list_a, ', list_b:', list_b)
+
+    # copy(shallow copy)でリストをコピーする
+    list_c = [1, 2, 3]
+    list_b = copy.copy(list_c)
+    list_b[1] = 100
+    print('[2] list_c:', list_c, ', list_b:', list_b)
+
+    # 多次元リストをshallow copyするとコピーは完全では無い
+    list_d = [[1, 2, 3], [4, 5, 6]]
+    list_b = copy.copy(list_d)
+    list_b[1][1] = 200
+    print('[3] list_d:', list_d, ', list_b:', list_b)
+
+    # 多次元リストのコピーには、deep copyを用いる
+    list_e = [[1, 2, 3], [4, 5, 6]]
+    list_b = copy.deepcopy(list_e)
+    list_b[1][1] = 200
+    print('[3] list_e:', list_e, ', list_b:', list_b)
+
+
+@wrap_comments
+def execute_generator():
+
+    def count_up():
+        """カウント値のジェネレータ関数
+        yield文を使うことで、この関数がジェネレータ関数になる
+        :return: カウント値
+        """
+        n = 1
+        while True:
+            yield n
+            n += 1
+
+    generator = count_up()
+
+    for num in generator:
+        print(num, end=' ')
+        if num == 7:
+            break
+
+    for num in generator:
+        print(num, end=' ')
+        if num == 15:
+            break
     pass
 
 
 def main():
     execute_basic_python_functons()
-    print('------------------------------')
     execute_python_app_functions()
+    execute_copy_function_demo()
+    execute_generator()
+    pass
 
 
 if __name__ == '__main__':
