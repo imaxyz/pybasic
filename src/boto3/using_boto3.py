@@ -11,5 +11,3 @@ data = open(filename, 'rb')
 result = s3.Bucket('pybasic-s3').put_object(Key=filename, Body=data)
 
 print('result: ', result)
-
-
