@@ -1,9 +1,11 @@
 # 定番アルゴリズムの検証
+import copy
+
 
 # 探索アルゴリズム
 
 
-def search_linear(data, target):
+def linear_search(data, target):
     """線形にデータを探索する"""
     for i in range(len(data)):
         if data[i] == target:
@@ -58,6 +60,8 @@ def bubble_sort(source):
         # 先頭要素から順番に、最後の要素まで、要素入れ替えでソートしていく
         _swap_sort_if_needed(source, index=i)
 
+def insert_sort(source):
+    pass
 
 def main():
     # 線形探索、二分探索に渡すデータ。ソート済み。
@@ -65,19 +69,23 @@ def main():
     target = 5
 
     # 線形探索
-    result = search_linear(data, target)
-    print('result1:', result)
+    result = linear_search(data, target)
+    print('linear search result:', result)
 
     # 2分探索
     result = binary_search(source=data, target=target)
-    print('result2:', result)
+    print('binary search result:', result)
 
     # バブルソート
     bubble_sort_source = [1, 3, 250, 8, 7, 5, 10, 12, 1]
     bubble_sort(source=bubble_sort_source)
     print('bubble sort result:', bubble_sort_source)
-    pass
 
+    # 挿入ソート
+    insert_sort_source = [1, 3, 250, 8, 7, 5, 10, 12, 1]
+    insert_sort(source=insert_sort_source)
+    print('insert_sort result:', insert_sort_source)
+    pass
 
 if __name__ == '__main__':
     main()
