@@ -10,6 +10,10 @@ class Animal(metaclass=ABCMeta):
 
 
 class Dog(Animal):
+    def __init__(self, name: str):
+        self.name = name
+        self.__weight = 10.0     # プライベート変数はダブルアンダースコアで定義
+
     def cry(self):
         print('わん')
 
