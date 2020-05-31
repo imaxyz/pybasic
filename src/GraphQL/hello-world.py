@@ -18,11 +18,12 @@ class SampleModel(graphene.ObjectType):
         return 'Goood bye!'
 
 
+# スキーマを取得
 schema = graphene.Schema(query=SampleModel)
+
+# スキーマに対してクエリする
 result = schema.execute('{ hello }')
 result2 = schema.execute('{ hoge }')
 result3 = schema.execute('{ goodbye }')
 
-# print(result.data['hello'])  # "Hello World"
-# print(result)  # "Hello World"
-print(result, result2, result3, sep="\n")  # "Hello World"
+print(result, result2, result3, sep="\n")
