@@ -2,3 +2,4 @@
 venv
 src/boto3/mails
 .env
+docs

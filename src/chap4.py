@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from enum import Enum, auto
 
+
 class Animal(metaclass=ABCMeta):
 
     # クラス変数
@@ -55,6 +56,7 @@ class AnimalFactory:
         else:
             return Cat()
 
+
 class Week(Enum):
     monday = auto()
     tuesday = auto()
@@ -63,6 +65,7 @@ class Week(Enum):
     friday = auto()
     saturday = auto()
     sunday = auto()
+
 
 def main():
     factory = AnimalFactory()
