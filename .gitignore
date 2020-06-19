@@ -3,3 +3,4 @@ venv
 src/boto3/mails
 .env
 docs
+pybasic-docs
