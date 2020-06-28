@@ -29,7 +29,8 @@ model = tree.DecisionTreeClassifier()
 
 # MINISTデータのダウンロード
 digits = datasets.load_digits()
-train_data, train_label, test_data, test_label = divide_training_data(digits=digits)
+train_data, train_label, test_data, test_label = divide_training_data(
+    digits=digits)
 
 # 機械学習を実行して、学習済みモデルを作成
 model.fit(train_data, train_label)
