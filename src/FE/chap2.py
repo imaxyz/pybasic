@@ -33,7 +33,7 @@ for i in range(5):
     print(i, end=' ')
 
 # ファイルを開いて、ファイルにprint()で出力する
-with open('../data/chp2-2.txt', 'at') as fp:
+with open('../../data/chp2-2.txt', 'at') as fp:
     print('Hello, world!', file=fp)
 
 # 例外の補足
