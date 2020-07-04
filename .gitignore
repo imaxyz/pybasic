@@ -4,3 +4,4 @@ src/boto3/mails
 .env
 docs
 pybasic-docs
+src/PyKakasi/data
