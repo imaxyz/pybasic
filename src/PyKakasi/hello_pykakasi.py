@@ -4,6 +4,7 @@
 import pykakasi
 import os
 import pprint
+import mojimoji
 from typing import (
     Dict,
     List
@@ -19,7 +20,7 @@ def convert_hiragana_to_romaji(kks, source_text: str) -> str:
     :param source_text: 日本語の文字列
     :return: ローマ字に変換された文字列
     """
-    text = source_text.replace('゙', '_dakuten_').replace('゚', '_handakten_')
+    text = source_text.replace('゙', '_dakuten_').replace('゚', '_handakten_').replace('ー', '-')
 
     kks.setMode('H', 'a')   # Hiragana to ascii, default: no conversion
     kks.setMode('K', 'a')   # Katakana to ascii, default: no conversion
@@ -30,8 +31,16 @@ def convert_hiragana_to_romaji(kks, source_text: str) -> str:
 
     converter = kks.getConverter()
 
+    # 日本語からローマ字に変換
     converted = converter.do(text)
-    return converted.replace(' ', '_').replace("'", '-')
+
+    # その他雑多な文字を変換
+    converted = converted.replace(' ', '_').replace("'", '-')
+
+    # 全角は半角に変換
+    converted = mojimoji.zen_to_han(converted)
+
+    return converted
 
 
 def create_file_paths(target_path: str) -> List[Dict[str, str]]:
