@@ -19,8 +19,7 @@ def convert_hiragana_to_romaji(kks, source_text: str) -> str:
     :param source_text: 日本語の文字列
     :return: ローマ字に変換された文字列
     """
-    text = source_text.replace('゙', '_dakuten_')
-    text = source_text.replace('゚', '_handakten_')
+    text = source_text.replace('゙', '_dakuten_').replace('゚', '_handakten_')
 
     kks.setMode('H', 'a')   # Hiragana to ascii, default: no conversion
     kks.setMode('K', 'a')   # Katakana to ascii, default: no conversion
