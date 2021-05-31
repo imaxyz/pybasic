@@ -1,6 +1,7 @@
 import numpy as np
 import requests
 from Crypto.PublicKey import RSA
+import re
 
 # numpyで二次元配列を生成してみる
 a = np.array([[1, 2], [3, 4]])
@@ -9,6 +10,10 @@ print(a)
 # dir()を用いて、インポートしたモジュールで利用できる関数やクラスを列挙する
 modules = dir(requests)
 print(modules)
+
+re_modules = dir(re)
+print(re_modules)
+
 
 # 通信してみる
 url = 'https://www.google.co.jp'

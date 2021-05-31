@@ -117,7 +117,7 @@ def execute_python_app_functions():
 
     print('double_value: ', double_value(2))
 
-    # 無名関数を用いてそーとする
+    # 無名関数を用いてソートする
     month_name = [(1, 'January'), (2, 'February'), (3, 'March')]
     month_name.sort(key=lambda x: x[1])
     print('month_name: ', month_name)
