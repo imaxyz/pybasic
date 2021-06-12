@@ -5,3 +5,4 @@ src/boto3/mails
 docs
 pybasic-docs
 src/PyKakasi/data
+src/building-deep-learning/chapter2/__pycache__
