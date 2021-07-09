@@ -7,3 +7,5 @@ pybasic-docs
 src/PyKakasi/data
 src/building-deep-learning/chapter2/__pycache__
 src/building-deep-learning/chapter3/__pycache__
+*.gz
+*.pkl

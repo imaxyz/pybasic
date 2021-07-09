@@ -36,6 +36,7 @@ def _download(file_name):
 
     print("Downloading " + file_name + " ... ")
     headers = {"User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0"}
+    request_url = url_base+file_name
     request = urllib.request.Request(url_base+file_name, headers=headers)
     response = urllib.request.urlopen(request).read()
     with open(file_path, mode='wb') as f:
