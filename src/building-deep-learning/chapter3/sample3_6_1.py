@@ -15,8 +15,6 @@ def img_show(image_array: np.ndarray):
 
 def main():
 
-    sys.path.append(os.pardir)  # 親ディレクトリのファイルをインポートするための設定
-
     # (訓練画像、訓練ラベル), (テスト画像、テストラベル)の形式でmnistデータを取得
     (train_images, train_labels), (test_images, test_labels) = load_mnist(
         # 画像を一次元配列にするか

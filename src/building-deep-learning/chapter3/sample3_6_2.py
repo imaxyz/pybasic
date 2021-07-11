@@ -1,8 +1,6 @@
 import pickle
-import sys, os
 import numpy as np
 from mnist import load_mnist    # mnistライブラリのload_mnist関数をインポート
-from PIL import Image
 
 
 def get_normalized_test_data():
@@ -21,7 +19,7 @@ def get_sample_weight():
     """サンプルの重みを返す"""
 
     # sample_weight.pkl ... 重みWとバイアスbのパラメータがディクショナリ型で登録されている
-    with open('sample_weight.pkl') as f:
+    with open('sample_weight.pkl', 'rb') as f:
         network = pickle.load(f)
 
     return network
@@ -55,7 +53,7 @@ def softmax(a):
     return y
 
 
-def predict(network, x):
+def predict(network: dict, x: np.ndarray):
     """
     3層ニューラルネットワークで予測する
 
@@ -83,6 +81,8 @@ def predict(network, x):
     z2 = stable_sigmoid(a2)
 
     a3 = np.dot(z2, W3) + b3
+
+    # 出力関数を通じて、10要素を得る
     y = softmax(a3)
 
     return y
@@ -90,20 +90,31 @@ def predict(network, x):
 
 def main():
 
-    sys.path.append(os.pardir)  # 親ディレクトリのファイルをインポートするための設定
+    # 正規化されたテスト画像とテストラベルを取得
+    test_images, expected_labels = get_normalized_test_data()
 
-    test_images, test_labels = get_normalized_test_data()
-
+    # サンプルの重みとバイアスを取得
     sample_weight = get_sample_weight()
 
+    # 的中した回数
     accuracy_cnt = 0
-    for i in range(len(test_images)):
-        y = predict(sample_weight, test_images[i])
-        p = np.argmax(y)  # 最も確率の高い要素のインデックスを取得
-        if p == test_labels[i]:
+    for index, test_image in enumerate(test_images):
+
+        # 予想を立てる
+        y = predict(network=sample_weight, x=test_image)
+
+        # 最も確率の高い要素のインデックスを取得
+        p = np.argmax(y)
+
+        # 期待値を取得
+        expected = expected_labels[index]
+
+        if p == expected:
             accuracy_cnt += 1
 
-    print("Accuracy:" + str(float(accuracy_cnt) / len(test_images)))
+    # 予想の命中率を求める
+    rate = accuracy_cnt / len(test_images)
+    print("命中率:", rate)
 
 
 if __name__ == '__main__':
