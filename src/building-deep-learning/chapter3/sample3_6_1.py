@@ -3,30 +3,47 @@ import numpy as np
 from mnist import load_mnist    # mnistライブラリのload_mnist関数をインポート
 from PIL import Image
 
-sys.path.append(os.pardir)  # 親ディレクトリのファイルをインポートするための設定
 
+def img_show(image_array: np.ndarray):
+    """PIL(Python Image Library)モジュールを使用して画像を表示する"""
 
-def img_show(img):
-    pil_img = Image.fromarray(np.uint8(img))
+    # 配列データから画像データを作成する
+    pil_img = Image.fromarray(np.uint8(image_array))
+
     pil_img.show()
 
 
 def main():
 
+    sys.path.append(os.pardir)  # 親ディレクトリのファイルをインポートするための設定
+
     # (訓練画像、訓練ラベル), (テスト画像、テストラベル)の形式でmnistデータを取得
-    (x_train, t_train), (x_test, t_test) = load_mnist(flatten=True, normalize=False)
+    (train_images, train_labels), (test_images, test_labels) = load_mnist(
+        # 画像を一次元配列にするか
+        flatten=True,
 
-    img = x_train[0]
-    label = t_train[0]
-    print(label)  # 5
+        # 画像のピクセル値を0.0~1.0に正規化するか
+        normalize=False,
 
-    print(img.shape)  # (784,)
-    img = img.reshape(28, 28)  # 形状を元の画像サイズに変形
+        # one-hot表現を行うか
+        one_hot_label=False,
+    )
+
+    # 訓練データの最初の要素を取得
+    train_image = train_images[0]
+    train_label = train_labels[0]
+
+    print('train_image.shape: ', train_image.shape)  # (784,)
+    print('train_label: ', train_label)  # 5
+
+    # 形状を元の画像サイズに変形
+    # MNISTの画像データのサイズは、28x28
+    train_image = train_image.reshape(28, 28)
     # img = img.reshape(50, 50)  # 形状を元の画像サイズに変形
-    print(img.shape)  # (28, 28)
+    print('train_image reshaped: ', train_image.shape)  # (28, 28)
 
-    img_show(img)
-    print('hello, mnist!')
+    print('show train_image image!')
+    img_show(train_image)
 
 
 if __name__ == '__main__':
