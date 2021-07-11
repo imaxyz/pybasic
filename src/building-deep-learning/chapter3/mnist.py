@@ -12,7 +12,7 @@ import numpy as np
 
 
 url_base = 'http://yann.lecun.com/exdb/mnist/'
-key_file = {
+g_mnist_download_files = {
     'train_img': 'train-images-idx3-ubyte.gz',
     'train_label': 'train-labels-idx1-ubyte.gz',
     'test_img': 't10k-images-idx3-ubyte.gz',
@@ -28,7 +28,7 @@ img_dim = (1, 28, 28)
 img_size = 784
 
 
-def _download(file_name):
+def _download_file(file_name):
     file_path = dataset_dir + "/" + file_name
 
     if os.path.exists(file_path):
@@ -45,8 +45,8 @@ def _download(file_name):
 
 
 def download_mnist():
-    for v in key_file.values():
-       _download(v)
+    for v in g_mnist_download_files.values():
+        _download_file(v)
 
 
 def _load_label(file_name):
@@ -74,10 +74,10 @@ def _load_img(file_name):
 
 def _convert_numpy():
     dataset = {}
-    dataset['train_img'] =  _load_img(key_file['train_img'])
-    dataset['train_label'] = _load_label(key_file['train_label'])
-    dataset['test_img'] = _load_img(key_file['test_img'])
-    dataset['test_label'] = _load_label(key_file['test_label'])
+    dataset['train_img'] =  _load_img(g_mnist_download_files['train_img'])
+    dataset['train_label'] = _load_label(g_mnist_download_files['train_label'])
+    dataset['test_img'] = _load_img(g_mnist_download_files['test_img'])
+    dataset['test_label'] = _load_label(g_mnist_download_files['test_label'])
 
     return dataset
 
@@ -85,9 +85,12 @@ def _convert_numpy():
 def init_mnist():
     download_mnist()
     dataset = _convert_numpy()
+
     print("Creating pickle file ...")
+
     with open(save_file, 'wb') as f:
         pickle.dump(dataset, f, -1)
+
     print("Done!")
 
 
