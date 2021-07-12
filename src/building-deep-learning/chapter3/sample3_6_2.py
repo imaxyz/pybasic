@@ -38,7 +38,9 @@ def stable_sigmoid(x):
     :return:
     """
 
-    sig = np.where(x < 0, np.exp(x) / (1 + np.exp(x)), 1 / (1 + np.exp(-x)))
+    sig = np.where(x < 0,
+                   np.exp(x) / (1 + np.exp(x)),
+                   1 / (1 + np.exp(-x)))
     return sig
 
 
