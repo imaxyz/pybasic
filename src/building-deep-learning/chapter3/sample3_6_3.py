@@ -98,11 +98,11 @@ def main():
     # サンプルの重みとバイアスを取得
     sample_weight = get_sample_weight()
 
-    # バッチサイズ
-    batch_size = 100
-
     # 的中した回数
     accuracy_cnt = 0
+
+    # バッチサイズ
+    batch_size = 100
 
     # 0〜test_imagesの量だけ、batch_size分だけスキップしたindexを作成
     for index in range(0, len(test_images), batch_size):
