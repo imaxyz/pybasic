@@ -15,8 +15,8 @@ def get_normalized_test_data():
     return test_images, test_labels
 
 
-def get_sample_weight():
-    """サンプルの重みを返す"""
+def get_sample_weight() -> dict:
+    """学習済みの重みバイアスの入った辞書を返す"""
 
     # sample_weight.pkl ... 重みWとバイアスbのパラメータがディクショナリ型で登録されている
     with open('sample_weight.pkl', 'rb') as f:
