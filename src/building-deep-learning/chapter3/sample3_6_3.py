@@ -98,21 +98,32 @@ def main():
     # サンプルの重みとバイアスを取得
     sample_weight = get_sample_weight()
 
+    # バッチサイズ
+    batch_size = 100
+
     # 的中した回数
     accuracy_cnt = 0
-    for index, test_image in enumerate(test_images):
+
+    # 0〜test_imagesの量だけ、batch_size分だけスキップしたindexを作成
+    for index in range(0, len(test_images), batch_size):
+
+        # テストデータから、バッチサイズの入力を取得
+        x_inputs = test_images[index:index+batch_size]
 
         # 予想を立てる
-        y = predict(network=sample_weight, x=test_image)
+        y_outputs = predict(network=sample_weight, x=x_inputs)
 
-        # 最も確率の高い要素のインデックスを取得
-        p = np.argmax(y)
+        # 1次元目の要素を軸として、最も確率の高い要素のインデックス（推論された番号）を取得
+        result_numbers = np.argmax(y_outputs, axis=1)
 
-        # 期待値を取得
-        expected = expected_labels[index]
+        # バッチサイズ分の期待値のリストを取得
+        expecteds = expected_labels[index:index+batch_size]
 
-        if p == expected:
-            accuracy_cnt += 1
+        # NumPy配列同士で、演算子==により、boolean配列を作成
+        result = (result_numbers == expecteds)
+
+        # Trueの個数（推論が期待に合致した数）を求める
+        accuracy_cnt += np.sum(result)
 
     # 予想の命中率を求める
     rate = accuracy_cnt / len(test_images)
