@@ -18,7 +18,8 @@ def main():
     # 7の確率を最も高くする
     y = np.array([0.1, 0.05, 0.1, 0.0, 0.05, 0.1, 0, 0.6, 0, 0])
     y2 = sum_squared_error(y, t)
-    pass
+
+    print(y1, y2)
 
 
 if __name__ == '__main__':
