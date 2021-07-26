@@ -15,7 +15,6 @@ def cross_entropy_error(y: np.ndarray, t: np.ndarray):
 
 
 def main():
-
     # 2を正解とする
     t = np.array([0, 0, 1, 0, 0, 0, 0, 0, 0, 0])
 
