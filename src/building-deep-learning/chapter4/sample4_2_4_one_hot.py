@@ -12,8 +12,10 @@ def one_hot_cross_entropy_error(y: np.ndarray, t: np.ndarray):
     """
     if y.ndim == 1:
         # ニューラルネットワークが1次元データ(n, )の場合、バッチ処理用に(1, n)へ整形する
-        one_hot_t = t.reshape(1, t.size)
+        t = t.reshape(1, t.size)
         y = y.reshape(1, y.size)
+
+    batch_size = y.shape[0]
 
     # 微小の値: deltaを宣言
     # 1e-2: 1 x 10**-2 = 0.01
@@ -21,7 +23,8 @@ def one_hot_cross_entropy_error(y: np.ndarray, t: np.ndarray):
     delta = 1e-7
 
     # np.log(0)の時、マイナスの無限大-infになり、暴走してしまうので、deltaを加える
-    result = -np.sum(t * np.log(y + delta))
+    # result = -np.sum(t * np.log(y + delta)) ...0.7339688834135556
+    result = -np.sum(t * np.log(y + delta)) / batch_size
     return result
 
 
