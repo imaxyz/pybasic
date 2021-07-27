@@ -2,8 +2,18 @@ import numpy as np
 from mnist import load_mnist    # mnistライブラリのload_mnist関数をインポート
 
 
-def cross_entropy_error(y: np.ndarray, t: np.ndarray):
-    """交差エントロピー誤差を返す"""
+def one_hot_cross_entropy_error(y: np.ndarray, t: np.ndarray):
+    """
+    交差エントロピー誤差を返す
+
+    :param y: ニューラルネットワークの出力
+    :param t: one-hot表現の教師データ
+    :return: 損失関数の計算結果
+    """
+    if y.ndim == 1:
+        # ニューラルネットワークが1次元データ(n, )の場合、バッチ処理用に(1, n)へ整形する
+        one_hot_t = t.reshape(1, t.size)
+        y = y.reshape(1, y.size)
 
     # 微小の値: deltaを宣言
     # 1e-2: 1 x 10**-2 = 0.01
@@ -37,17 +47,20 @@ def main():
     batch_train_labels = train_labels[random_choice_indexes]
 
     # t: one-hot表現の教師データ, 2を正解とする
-    t = np.array([0, 0, 1, 0, 0, 0, 0, 0, 0, 0])
+    one_hot_t = np.array([
+        [0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+    ])
 
     # y: ニューラルネットワークの出力, 2の確率を最も高くする
-    y = np.array([0.1, 0.05, 0.6, 0.0, 0.05, 0.1, 0, 0.1, 0, 0])
-    y1 = cross_entropy_error(y, t)
+    y = np.array([
+        [0.1, 0.05, 0.6, 0.0, 0.05, 0.1, 0, 0.1, 0, 0],
+        [0.1, 0.05, 0.6, 0.0, 0.05, 0.1, 0, 0.1, 0.8, 0],
+    ])
 
-    # y: ニューラルネットワークの出力, 7の確率を最も高くする
-    y = np.array([0.1, 0.05, 0.1, 0.0, 0.05, 0.1, 0, 0.6, 0, 0])
-    y2 = cross_entropy_error(y, t)
+    result = one_hot_cross_entropy_error(y, one_hot_t)
 
-    print(y1, y2)
+    print(result)
 
 
 if __name__ == '__main__':

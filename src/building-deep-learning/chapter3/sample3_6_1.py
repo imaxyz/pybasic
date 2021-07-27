@@ -34,7 +34,7 @@ def main():
     print('train_image.shape: ', train_image.shape)  # (784,)
     print('train_label: ', train_label)  # 5
 
-    # 形状を元の画像サイズに変形
+    # 形状を元の画像サイズに変形 (784 -> 28x28)
     # MNISTの画像データのサイズは、28x28
     train_image = train_image.reshape(28, 28)
     # img = img.reshape(50, 50)  # 形状を元の画像サイズに変形
