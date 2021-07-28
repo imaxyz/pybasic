@@ -12,7 +12,7 @@ def label_cross_entrory_error(y: np.ndarray, t: np.ndarray):
     """
     if y.ndim == 1:
         # ニューラルネットワークが1次元データ(n, )の場合、バッチ処理用に(1, n)へ整形する
-        label_t = t.reshape(1, t.size)
+        t = t.reshape(1, t.size)
         y = y.reshape(1, y.size)
 
     batch_size = y.shape[0]
@@ -50,12 +50,16 @@ def main():
 
     # t: ラベル表現の教師データ
     one_hot_t = np.array([2, 8])
+    # one_hot_t = np.array([2])
 
     # y: ニューラルネットワークの出力, 2の確率を最も高くする
     y = np.array([
         [0.1, 0.05, 0.6, 0.0, 0.05, 0.1, 0, 0.1, 0, 0],
         [0.1, 0.05, 0.3, 0.0, 0.05, 0.1, 0, 0.0, 0.9, 0],
     ])
+    # y = np.array(
+    #     [0.1, 0.05, 0.6, 0.0, 0.05, 0.1, 0, 0.1, 0, 0],
+    # )
 
     result = label_cross_entrory_error(y, one_hot_t)
 
