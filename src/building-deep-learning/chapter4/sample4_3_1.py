@@ -10,7 +10,6 @@ def numerical_diff(f, x):
 def main():
 
     result = numerical_diff(func, 15)
-
     print('result: ', result)
 
 
