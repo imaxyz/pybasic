@@ -76,8 +76,8 @@ def main():
 
 def main2():
 
-    x0_result = numerical_diff(func=function_tmp1, x=3.0)
-    x1_result = numerical_diff(func=function_tmp2, x=4.0)
+    x0_result = numerical_diff(func=function_tmp1, x=3)
+    x1_result = numerical_diff(func=function_tmp2, x=4)
 
     print('x0_result: ', x0_result)
     print('x1_result: ', x1_result)
