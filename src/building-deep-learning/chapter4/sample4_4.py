@@ -24,7 +24,7 @@ def function_3b(x):
     # return x[0]**2 + x[1]**2
 
 
-def _numerical_gradient_no_batch(func, x: np.ndarray):
+def single_numerical_gradient(func, x: np.ndarray):
     """
     xで指定された、ある点に関する各変数の勾配を求めて返す。
     （実質、引数の各要素ごとに数値微分を行なっているのみ。）
@@ -60,7 +60,21 @@ def _numerical_gradient_no_batch(func, x: np.ndarray):
     return gradient
 
 
-def numerical_diff(func, x):
+def get_numerical_gradient(f, matrix: np.ndarray):
+    """勾配を求めて返す"""
+    if matrix.ndim == 1:
+        return single_numerical_gradient(f, matrix)
+    else:
+        grad = np.zeros_like(matrix)
+
+        for idx, x in enumerate(matrix):
+            # (e.g) x: [-1.5001 -2.0001]
+            grad[idx] = single_numerical_gradient(f, x)
+
+        return grad
+
+
+def get_numerical_diff(func, x):
     """数値微分で微分を求める"""
     h = 1e-4
 
@@ -79,7 +93,7 @@ def get_tangent_line_lambda(func, x):
     """
 
     # xの微分(接線の傾き)を求める
-    d = numerical_diff(func, x)
+    d = get_numerical_diff(func, x)
     print('微分: ', d)
 
     # 切片を求める
@@ -92,7 +106,7 @@ def get_tangent_line_lambda(func, x):
 
 
 def main():
-    # 変数を定義
+    # -3.0〜3.0までの値をもつリストを定義
     x0 = np.arange(-3.0, 3.0, 0.25)
     x1 = np.arange(-3.0, 3.0, 0.25)
 
@@ -118,29 +132,79 @@ def main2():
     # 1つの変数ごとに偏微分を求める
 
     # x0の偏微分のため、x1の値を固定した関数でx0の微分を求める
-    x0_result = numerical_diff(func=function_tmp1, x=3.0)
+    x0_result = get_numerical_diff(func=function_tmp1, x=3.0)
 
     # x1の偏微分のため、x0の値を固定した関数でx1の微分を求める
-    x1_result = numerical_diff(func=function_tmp2, x=4.0)
+    x1_result = get_numerical_diff(func=function_tmp2, x=4.0)
 
     print('x0_result: ', x0_result)
     print('x1_result: ', x1_result)
 
 
 def main3():
+    # 各点における勾配を求める
 
     # [3, 4] で指定すると、ndarrayのdtypeがint64（整数型）になり、微細な値を扱えなくなるのでfloatで指定
-    result1 = _numerical_gradient_no_batch(function_3b, np.array([3.0, 4.0]))
+    result1 = single_numerical_gradient(function_3b, np.array([3.0, 4.0]))
     print(result1)
 
-    result2 = _numerical_gradient_no_batch(function_3b, np.array([0.0, 2.0]))
+    result2 = single_numerical_gradient(function_3b, np.array([0.0, 2.0]))
     print(result2)
 
-    result3 = _numerical_gradient_no_batch(function_3b, np.array([3.0, 0.0]))
+    result3 = single_numerical_gradient(function_3b, np.array([3.0, 0.0]))
     print(result3)
+
+
+def main4():
+    # 勾配を矢印で図に描画する
+
+    x0 = np.arange(-5, 5, 0.25)
+    x1 = np.arange(-5, 5, 0.25)
+    X, Y = np.meshgrid(x0, x1)
+
+    X = X.flatten()
+    Y = Y.flatten()
+
+    # (2, 1600)行列の作成
+    matrix_orig = np.array([X, Y])
+
+    # (1600, 2)行列の作成(転置行列)
+    matrix = matrix_orig.T
+
+    # (1600, 2)行列の勾配を求めて、(2, 1600)の形に戻す。(再び、転置行列を得る）
+    # 2... (X [...], Y[...])
+    gradient = get_numerical_gradient(function_3b, matrix).T
+
+    # 新しい図を生成する
+    plt.figure()
+
+    # 矢印をプロット（グラフを描画）する
+    plt.quiver(X, Y,
+               # 勾配ベクトルの結果にマイナスをつけて、方向を逆向きにする
+               -gradient[0],    # (1600, )
+               -gradient[1],    # (1600, )
+               angles="xy", color="#3333ff")
+    # plt.quiver(X, Y, grad[0], grad[1],  angles="xy", color="#ff6666")
+
+    # グラフの範囲を-5.5〜5とする
+    plt.xlim([-5.5, 5])
+    plt.ylim([-5.5, 5])
+
+    plt.xlabel('x0')
+    plt.ylabel('x1')
+
+    # グラフに、グリッドを描画する
+    plt.grid()
+
+    # 図を再描画する
+    # plt.draw()
+
+    # 図を表示する
+    plt.show()
 
 
 if __name__ == '__main__':
     # main()
     # main2()
-    main3()
+    # main3()
+    main4()
