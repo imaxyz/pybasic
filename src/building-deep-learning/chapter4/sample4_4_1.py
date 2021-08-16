@@ -24,6 +24,28 @@ def function_3b(x):
     # return x[0]**2 + x[1]**2
 
 
+def gradient_descent(func, init_x, learning_rate=0.01, step_num=100):
+    """
+    勾配降下法で学習する
+
+    :param func: 対象の関数
+    :param init_x: 初期値
+    :param learning_rate: 学習率
+    :param step_num: 勾配法による繰り返しの数
+
+    :return: 処理結果, 処理結果の履歴
+    """
+
+    x = init_x
+    logs = [x.copy()]
+
+    for i in range(step_num):
+        x -= learning_rate * single_numerical_gradient(func, x)
+        logs.append(x.copy())
+
+    return x, np.array(logs)
+
+
 def single_numerical_gradient(func, x: np.ndarray):
     """
     xで指定された、ある点に関する各変数の勾配を求めて返す。
@@ -55,7 +77,8 @@ def single_numerical_gradient(func, x: np.ndarray):
         # 数値微分で微分を求めて、勾配として結果の配列に格納する
         gradient[idx] = (result_x_plus_h - result_x_minus_h) / (2 * h)
 
-        x[idx] = tmp_val  # 値を元に戻す
+        # 値を元に戻す。この処理が無いと、勾配降下法で結果が異常になる。
+        x[idx] = tmp_val
 
     return gradient
 
@@ -203,8 +226,49 @@ def main4():
     plt.show()
 
 
+def main5():
+    # 勾配降下法で最小値を探索する
+    result, logs = gradient_descent(function_3b,
+                                    init_x=np.array([-3.0, 4.0]),
+                                    learning_rate=0.1, step_num=100)
+    print('result: ', result)
+
+
+def main6():
+
+    # 勾配降下法で最小値を探索する
+    result, logs = gradient_descent(function_3b,
+                                    init_x=np.array([-3.0, 4.0]),
+                                    learning_rate=0.1, step_num=100)
+
+    # 点線を打つ[xデータ], [yデータ], フォーマット文字列
+    # フォーマット文字列の仕様: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot
+    # b- : 青の実線
+    # ro : 赤の円
+    # plt.plot([-5, 5], [0, 0], 'b--')    # 横線
+    # plt.plot([-5, 5], [0, 0], 'b-.')    # 横線
+    plt.plot([-5, 5], [0, 0], 'k:')  # 横線
+    # plt.plot([-4, 3], [0, 0], '^g')    # 横線
+    # plt.plot([0, 0], [-5, 5], '--b')  # 縦線
+    plt.plot([0, 0], [-5, 5], ':k')  # 縦線
+
+    # plt.plot(x_history[:, 0], x_history[:, 1], 'o')
+    plt.plot(logs[:, 0], logs[:, 1], '^g')
+
+    # 関数の最小値をプロット
+    plt.plot(result[0], result[1], 'ro')
+
+    plt.xlim(-3.5, 3.5)
+    plt.ylim(-4.5, 4.5)
+    plt.xlabel("X0")
+    plt.ylabel("X1")
+    plt.show()
+
+
 if __name__ == '__main__':
     # main()
     # main2()
     # main3()
-    main4()
+    # main4()
+    # main5()
+    main6()
