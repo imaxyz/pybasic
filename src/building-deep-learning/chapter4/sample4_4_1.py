@@ -265,10 +265,49 @@ def main6():
     plt.show()
 
 
+def main7():
+
+    # 学習率が大き過ぎる例
+    result1, logs1 = gradient_descent(function_3b,
+                                    init_x=np.array([-3.0, 4.0]),
+                                    learning_rate=10.0, step_num=100)
+
+    # 学習率が小さ過ぎる例
+    result2, logs2 = gradient_descent(function_3b,
+                                    init_x=np.array([-3.0, 4.0]),
+                                    learning_rate=1e-10, step_num=100)
+
+    # 点線を打つ[xデータ], [yデータ], フォーマット文字列
+    # フォーマット文字列の仕様: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot
+    # b- : 青の実線
+    # ro : 赤の円
+    # plt.plot([-5, 5], [0, 0], 'b--')    # 横線
+    # plt.plot([-5, 5], [0, 0], 'b-.')    # 横線
+    plt.plot([-5, 5], [0, 0], 'k:')  # 横線
+    # plt.plot([-4, 3], [0, 0], '^g')    # 横線
+    # plt.plot([0, 0], [-5, 5], '--b')  # 縦線
+    plt.plot([0, 0], [-5, 5], ':k')  # 縦線
+
+    # plt.plot(x_history[:, 0], x_history[:, 1], 'o')
+    plt.plot(logs1[:, 0], logs1[:, 1], '^b')
+    plt.plot(logs2[:, 0], logs2[:, 1], '^r')
+
+    # 関数の最小値をプロット
+    plt.plot(result1[0], result1[1], 'bo')
+    plt.plot(result2[0], result2[1], 'go')
+
+    plt.xlim(-3.5, 3.5)
+    plt.ylim(-4.5, 4.5)
+    plt.xlabel("X0")
+    plt.ylabel("X1")
+    plt.show()
+    pass
+
 if __name__ == '__main__':
     # main()
     # main2()
     # main3()
     # main4()
     # main5()
-    main6()
+    # main6()
+    main7()
