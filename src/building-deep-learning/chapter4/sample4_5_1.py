@@ -160,7 +160,7 @@ class TwoLayerNet:
         x = x - np.max(x, axis=-1, keepdims=True)  # オーバーフロー対策
         return np.exp(x) / np.sum(np.exp(x), axis=-1, keepdims=True)
 
-    def predict(self, x: np.ndarray):
+    def _predict(self, x: np.ndarray):
         """
         推論（認識）を行う
         入力されたパラメータ配列と、重みの、行列積を返す
@@ -172,10 +172,14 @@ class TwoLayerNet:
         W1, W2 = self.params['W1'], self.params['W2']
         b1, b2 = self.params['b1'], self.params['b2']
 
+        # 1層目の入力信号の総和を求める
         a1 = np.dot(x, W1) + b1
+        # 活性化関数にシグモイド関数を用いて1層目の値を0.0〜1.0に丸める
         z1 = self._sigmoid(a1)
 
+        # 2層目の入力信号の総和を求める
         a2 = np.dot(z1, W2) + b2
+        # 出力関数にソフトマックス関数を用いて2層目の値を0.0〜1.0に丸める
         y = self._softmax(a2)
 
         return y
@@ -200,16 +204,28 @@ class TwoLayerNet:
         :param t: 教師データ
         :return:
         """
-        y = self.predict(x)
+        y = self._predict(x)
 
         return self._cross_entropy_error(y, t)
 
     def accuracy(self, x, t):
-        y = self.predict(x)
-        y = np.argmax(y, axis=1)
-        t = np.argmax(t, axis=1)
+        """
+        ニューラルネットワークの精度を求める
+        :param x:
+        :param t:
+        :return:
+        """
+        # 入力データに対して、ネットワークの重みとバイアスを考慮してニューラルネットワークの計算を行う
+        y = self._predict(x=x)
 
-        accuracy = np.sum(y == t) / float(x.shape[0])
+        # ニューラルネットワーク予測の各行における最大値のインデックスを求める
+        y_max_indexes = np.argmax(y, axis=1)
+
+        # 訓練データの各行における最大値のインデックスを求める
+        t_max_indexes = np.argmax(t, axis=1)
+
+        # 正答率を計算する
+        accuracy = np.sum(y_max_indexes == t_max_indexes) / float(x.shape[0])
         return accuracy
 
     def numerical_gradient(self, x, t):
@@ -259,10 +275,10 @@ class TwoLayerNet:
         :param t:
         :return:
         """
+        # ニューラルネットワークの計算を実行する。
+        # _predict()との違いは、a1, z1を後続の処理で使用すること
         W1, W2 = self.params['W1'], self.params['W2']
         b1, b2 = self.params['b1'], self.params['b2']
-
-        batch_num = x.shape[0]
 
         # forward
         a1 = np.dot(x, W1) + b1
@@ -271,6 +287,7 @@ class TwoLayerNet:
         y = self._softmax(a2)
 
         # backward
+        batch_num = x.shape[0]
         grads = {}
         dy = (y - t) / batch_num
         grads['W2'] = np.dot(z1.T, dy)
@@ -313,26 +330,27 @@ def main2():
 
     # 2層ニューラルネットワークを生成する
     net = TwoLayerNet(input_size=image_size,    # 入力層のニューロン数
-                      hidden_size=100,          # 隠れ層のニューロン数
-                      output_size=10)           # 出力層のニューロン数
+                      output_size=10,           # 出力層のニューロン数
+                      hidden_size=100)          # 隠れ層のニューロン数
 
     # ダミーの入力データを作成（画像100枚分）
     x = np.random.rand(100, image_size)
 
-    # 推論処理のテスト
-    y = net.predict(x)
-
     # ダミーの正解ラベルを生成（画像100枚分）
     t = np.random.rand(100, 10)
 
-    # 数値微分でxの勾配を求める
-    # gradient = net.numerical_gradient(x, t)
-    gradient = net.gradient(x, t)
+    # ニューラルネットワークの精度を求める
+    accuracy = net.accuracy(x=x, t=t)
+    print('accuracy: ', accuracy)
 
-    # result = net.accuracy(gradient, t)
-    # print('result: ', result)
+    # 数値微分で入力データの勾配を求める
+    # gradient = net.numerical_gradient(x, t)
+
+    # 誤差逆伝搬法で入力データの勾配を求める
+    gradient = net.gradient(x, t)
     print('gradient.keys: ', gradient.keys())
 
+    # 損失関数の値を計算する
     loss_result = net.loss(x=x, t=t)
     print('loss result: ', loss_result)
 
