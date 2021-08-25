@@ -55,6 +55,7 @@ class SimpleNet:
     def _predict(self, input_x: np.ndarray):
         """
         入力されたパラメータ配列と、重みの、行列積を返す
+
         :param input_x: 入力された行列
         :return: 処理結果の行列積
         """
@@ -129,7 +130,7 @@ class TwoLayerNet:
                  output_size,
                  weight_init_std=0.01):
         """
-        初期化
+        重みパラメータを初期化する
 
         :param input_size: 入力層のニューロン数
         :param hidden_size: 隱れ層のニューロン数
@@ -140,28 +141,29 @@ class TwoLayerNet:
         # params: このネットワークに必要なパラメータを集約する
         self.params = {}
 
-        # W1: 1層目の重み
-        self.params['W1'] = weight_init_std * np.random.randn(input_size,
-                                                              hidden_size)
-        # b1: 1層目のバイアス
+        # W1: 1層目の重み。正規分布に従う乱数で初期化する
+        self.params['W1'] = weight_init_std * np.random.randn(input_size, hidden_size)
+
+        # b1: 1層目のバイアスをゼロで初期化する
         self.params['b1'] = np.zeros(hidden_size)
 
         # W2: 2層目の重み
-        self.params['W2'] = weight_init_std * np.random.randn(hidden_size,
-                                                              output_size)
-        # b2: 2層目のバイアス
+        self.params['W2'] = weight_init_std * np.random.randn(hidden_size, output_size)
+
+        # b2: 2層目のバイアスをゼロで初期化する
         self.params['b2'] = np.zeros(output_size)
 
-    def sigmoid(self, x: np.ndarray):
+    def _sigmoid(self, x: np.ndarray):
         return 1 / (1 + np.exp(-x))
 
-    def softmax(self, x: np.ndarray):
+    def _softmax(self, x: np.ndarray):
         x = x - np.max(x, axis=-1, keepdims=True)  # オーバーフロー対策
         return np.exp(x) / np.sum(np.exp(x), axis=-1, keepdims=True)
 
     def predict(self, x: np.ndarray):
         """
         推論（認識）を行う
+        入力されたパラメータ配列と、重みの、行列積を返す
 
         :param x: 画像データ
         :return:
@@ -171,13 +173,14 @@ class TwoLayerNet:
         b1, b2 = self.params['b1'], self.params['b2']
 
         a1 = np.dot(x, W1) + b1
-        z1 = self.sigmoid(a1)
+        z1 = self._sigmoid(a1)
+
         a2 = np.dot(z1, W2) + b2
-        y = self.softmax(a2)
+        y = self._softmax(a2)
 
         return y
 
-    def cross_entropy_error(self, y, t):
+    def _cross_entropy_error(self, y, t):
         if y.ndim == 1:
             t = t.reshape(1, t.size)
             y = y.reshape(1, y.size)
@@ -191,6 +194,7 @@ class TwoLayerNet:
 
     def loss(self, x, t):
         """
+        損失関数の値を求める
 
         :param x: 入力データ
         :param t: 教師データ
@@ -198,7 +202,7 @@ class TwoLayerNet:
         """
         y = self.predict(x)
 
-        return self.cross_entropy_error(y, t)
+        return self._cross_entropy_error(y, t)
 
     def accuracy(self, x, t):
         y = self.predict(x)
@@ -245,7 +249,7 @@ class TwoLayerNet:
         }
 
     def sigmoid_grad(self, x):
-        return (1.0 - self.sigmoid(x)) * self.sigmoid(x)
+        return (1.0 - self._sigmoid(x)) * self._sigmoid(x)
 
     def gradient(self, x, t):
         """
@@ -262,9 +266,9 @@ class TwoLayerNet:
 
         # forward
         a1 = np.dot(x, W1) + b1
-        z1 = self.sigmoid(a1)
+        z1 = self._sigmoid(a1)
         a2 = np.dot(z1, W2) + b2
-        y = self.softmax(a2)
+        y = self._softmax(a2)
 
         # backward
         grads = {}
@@ -301,26 +305,36 @@ def main():
     dW = numerical_gradient(func, net.W)
     print(dW)
 
+
 def main2():
 
+    # 画像サイズを定義(mnistを想定)
     image_size = 28*28
+
     # 2層ニューラルネットワークを生成する
-    net = TwoLayerNet(input_size=image_size,
-                      hidden_size=100,
-                      output_size=10)
+    net = TwoLayerNet(input_size=image_size,    # 入力層のニューロン数
+                      hidden_size=100,          # 隠れ層のニューロン数
+                      output_size=10)           # 出力層のニューロン数
 
-    #推論処理のテスト
-
-    # ダミーの入力データを作成（100枚分）
+    # ダミーの入力データを作成（画像100枚分）
     x = np.random.rand(100, image_size)
+
+    # 推論処理のテスト
     y = net.predict(x)
 
-    # ダミーの正解ラベルを生成（100枚分）
+    # ダミーの正解ラベルを生成（画像100枚分）
     t = np.random.rand(100, 10)
 
     # 数値微分でxの勾配を求める
-    gradient = net.numerical_gradient(x, t)
-    # gradient = net.gradient(x, t)
+    # gradient = net.numerical_gradient(x, t)
+    gradient = net.gradient(x, t)
+
+    # result = net.accuracy(gradient, t)
+    # print('result: ', result)
+    print('gradient.keys: ', gradient.keys())
+
+    loss_result = net.loss(x=x, t=t)
+    print('loss result: ', loss_result)
 
     pass
 
