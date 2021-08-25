@@ -44,83 +44,6 @@ def numerical_gradient(func, x: np.ndarray):
     return gradient
 
 
-class SimpleNet:
-    """単層ニューラルネットワーク"""
-
-    def __init__(self):
-        # 正規分布(ガウス分布)を持つ2x3の乱数行列を作成して、ダミーの重みとする
-        self.W = np.random.randn(2, 3)
-        pass
-
-    def _predict(self, input_x: np.ndarray):
-        """
-        入力されたパラメータ配列と、重みの、行列積を返す
-
-        :param input_x: 入力された行列
-        :return: 処理結果の行列積
-        """
-
-        result = np.dot(input_x, self.W)
-        return result
-
-    @staticmethod
-    def _softmax(input_x: np.ndarray):
-        """
-        ソフトマックス関数(出力関数)
-        入力を結果が0〜1の間の実数に変換する
-        """
-        revised = input_x - np.max(input_x, axis=-1, keepdims=True)  # オーバーフロー対策
-        result = np.exp(revised) / np.sum(np.exp(revised), axis=-1, keepdims=True)
-
-        return result
-
-    @staticmethod
-    def _one_hot_cross_entropy_error(y: np.ndarray, t: np.ndarray):
-        """
-        交差エントロピー誤差を返す
-
-        :param y: ニューラルネットワークの出力
-        :param t: one-hot表現の教師データ
-        :return: 損失関数の計算結果
-        """
-        if y.ndim == 1:
-            # ニューラルネットワークが1次元データ(n, )の場合、バッチ処理用に(1, n)へ整形する
-            t = t.reshape(1, t.size)
-            y = y.reshape(1, y.size)
-
-        batch_size = y.shape[0]
-
-        # 微小の値: deltaを宣言
-        # 1e-2: 1 x 10**-2 = 0.01
-        # 1e-7: 1 x 10**-7 = 0.0000001
-        delta = 1e-7
-
-        # np.log(0)の時、マイナスの無限大-infになり、暴走してしまうので、deltaを加える
-        # result = -np.sum(t * np.log(y + delta)) ...0.7339688834135556
-        result = -np.sum(t * np.log(y + delta)) / batch_size
-        return result
-
-    def loss(self, input_x: np.ndarray, input_t: np.ndarray):
-        """
-        損失関数の値を求める
-
-        :param input_x: 入力データ（行）
-        :param input_t: 正解ラベル（列）
-        :return:
-        """
-
-        # 入力データと重みの行列積を求める
-        z = self._predict(input_x)
-
-        # 出力関数として、ソフトマックス関数にかける
-        y = SimpleNet._softmax(z)
-
-        # 損失関数の値を求める: 交差エントロピー誤差を計算する。結果が小さい方が良い
-        loss_value = SimpleNet._one_hot_cross_entropy_error(y=y, t=input_t)
-
-        return loss_value
-
-
 class TwoLayerNet:
     """2層ニューラルネットワーク"""
 
@@ -184,7 +107,14 @@ class TwoLayerNet:
 
         return y
 
-    def _cross_entropy_error(self, y, t):
+    def _label_cross_entropy_error(self, y, t):
+        """
+        1個あたり平均の交差エントロピー誤差を返す
+
+        :param y:
+        :param t: ラベル表現の訓練データ
+        :return:
+        """
         if y.ndim == 1:
             t = t.reshape(1, t.size)
             y = y.reshape(1, y.size)
@@ -204,9 +134,13 @@ class TwoLayerNet:
         :param t: 教師データ
         :return:
         """
+        # ニューラルネットワークで伝搬する
         y = self._predict(x)
 
-        return self._cross_entropy_error(y, t)
+        # 伝搬結果の損失確率を求める
+        loss_result = self._label_cross_entropy_error(y, t)
+
+        return loss_result
 
     def accuracy(self, x, t):
         """
@@ -228,7 +162,7 @@ class TwoLayerNet:
         accuracy = np.sum(y_max_indexes == t_max_indexes) / float(x.shape[0])
         return accuracy
 
-    def numerical_gradient(self, x, t):
+    def get_numerical_gradient(self, x, t):
         """
         数値微分により重みに対する勾配を求める（低速版）
 
@@ -264,7 +198,7 @@ class TwoLayerNet:
             'b2': b2
         }
 
-    def sigmoid_grad(self, x):
+    def _sigmoid_grad(self, x):
         return (1.0 - self._sigmoid(x)) * self._sigmoid(x)
 
     def gradient(self, x, t):
@@ -294,7 +228,7 @@ class TwoLayerNet:
         grads['b2'] = np.sum(dy, axis=0)
 
         dz1 = np.dot(dy, W2.T)
-        da1 = self.sigmoid_grad(a1) * dz1
+        da1 = self._sigmoid_grad(a1) * dz1
         grads['W1'] = np.dot(x.T, da1)
         grads['b1'] = np.sum(da1, axis=0)
 
@@ -302,28 +236,6 @@ class TwoLayerNet:
 
 
 def main():
-    """ニューラルネットワークの勾配を求める"""
-
-    # 2行分のデータ
-    x = np.array([0.6, 0.9])
-
-    # 正解ラベル(3列分)
-    t = np.array([0, 0, 1])
-
-    # ニューラルネットワークの勾配を求めるオブジェクトを生成
-    net = SimpleNet()
-
-    # 損失関数(交差エントロピー誤差を使用)を定義
-    # --> 重みwを引数に取り、net.loss(x, t) の結果を返す無名関数を定義している
-    func = lambda w: net.loss(x, t)
-
-    # 重みパラメータに関数する損失関数の勾配を求める（多次元配列に対応）
-    # 結果(dW) は、重みWと同じ形状になる
-    dW = numerical_gradient(func, net.W)
-    print(dW)
-
-
-def main2():
 
     # 画像サイズを定義(mnistを想定)
     image_size = 28*28
@@ -344,10 +256,10 @@ def main2():
     print('accuracy: ', accuracy)
 
     # 数値微分で入力データの勾配を求める
-    # gradient = net.numerical_gradient(x, t)
+    gradient = net.get_numerical_gradient(x, t)
 
     # 誤差逆伝搬法で入力データの勾配を求める
-    gradient = net.gradient(x, t)
+    # gradient = net.gradient(x, t)
     print('gradient.keys: ', gradient.keys())
 
     # 損失関数の値を計算する
@@ -358,6 +270,6 @@ def main2():
 
 if __name__ == '__main__':
     # main()
-    main2()
+    main()
 
 
