@@ -17,11 +17,8 @@ def numerical_gradient(func, x: np.ndarray):
 
     h = 1e-4  # 0.0001
 
-    count = 0
     # 入力xの全要素分、処理を繰り返す
     while not it.finished:
-        # print('numerical_gradient() loop: ', count)
-
         # 要素のインデックス(タプル形式) を取得
         element_index_tuple = it.multi_index
 
@@ -34,12 +31,12 @@ def numerical_gradient(func, x: np.ndarray):
         fxh2 = func(x)  # f(x-h)
 
         # 微分の結果を、勾配リストに登録する
-        gradient[element_index_tuple] = (fxh1 - fxh2) / (2 * h)
+        value = (fxh1 - fxh2) / (2 * h)
+        gradient[element_index_tuple] = value
 
         x[element_index_tuple] = tmp_val  # 値を元に戻す
 
         it.iternext()
-        count += 1
 
     return gradient
 
@@ -124,7 +121,9 @@ class TwoLayerNet:
             t = t.argmax(axis=1)
 
         batch_size = y.shape[0]
-        return -np.sum(np.log(y[np.arange(batch_size), t] + 1e-7)) / batch_size
+
+        result = -np.sum(np.log(y[np.arange(batch_size), t] + 1e-7)) / batch_size
+        return result
 
     def loss(self, x, t):
         """
@@ -191,12 +190,7 @@ class TwoLayerNet:
         b2 = numerical_gradient(loss_W, self.params['b2'])
 
         # 各種勾配をまとめて返す
-        return {
-            'W1': W1,
-            'b1': b1,
-            'W2': W2,
-            'b2': b2
-        }
+        return { 'W1': W1, 'b1': b1, 'W2': W2, 'b2': b2 }
 
     def _sigmoid_grad(self, x):
         return (1.0 - self._sigmoid(x)) * self._sigmoid(x)
