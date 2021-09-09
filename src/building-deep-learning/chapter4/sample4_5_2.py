@@ -231,12 +231,42 @@ class TwoLayerNet:
         return grads
 
 
+def save_accuracy_log(train_images, train_labels, test_images, test_labels,
+                      network, train_acc_history, test_acc_history):
+    """
+    訓練データとテストデータに対する、ニューラルネットワークの精度を求めて、ログとして記録する
+
+    :param train_images:    訓練データ
+    :param train_labels:    訓練ラベル
+    :param test_images:     テストデータ
+    :param test_labels:     テストラベル
+    :param network:         ニューラルネットワーク
+    :param train_acc_history:   訓練データに対する制度の履歴
+    :param test_acc_history:    テストデータに対する制度の履歴
+    """
+    # 訓練データに対する、ニューラルネットワークの精度を求める
+    train_accuracy = network.accuracy(train_images, train_labels)
+
+    # テストデータに対する、ニューラルネットワークの精度を求める
+    test_accuracy = network.accuracy(test_images, test_labels)
+
+    # 訓練データとテストデータの精度のログをとる
+    train_acc_history.append(train_accuracy)
+    test_acc_history.append(test_accuracy)
+
+    print("train acc, test acc | ", train_accuracy, test_accuracy)
+
 def main():
 
+    # ----------------------------------
     # mnist画像データを取得する
     # (訓練画像、訓練ラベル), (テスト画像、テストラベル)の形式でmnistデータを取得
+    # ----------------------------------
     (train_images, train_labels), (test_images, test_labels) = load_mnist(
+
+        # 画像データを1次元に変換する
         flatten=True,
+
         # 画像のピクセル値を0.0~1.0に正規化するか
         normalize=True,
 
@@ -244,93 +274,101 @@ def main():
         one_hot_label=True,
     )
 
+    # ----------------------------------
+    # 2層ニューラルネットワークを生成
+    # ----------------------------------
     # mnist画像データのサイズ
     image_size = 28*28
     output_class_count = 10
 
-    # 2層ニューラルネットワークを生成
-    network = TwoLayerNet(input_size=image_size, hidden_size=50, output_size=output_class_count)
+    network = TwoLayerNet(
+        input_size=image_size, 
+        hidden_size=50, 
+        output_size=output_class_count)
 
-    iters_num = 10000  # 繰り返しの回数を適宜設定する
+
+    # 損失関数の推移を格納する領域
+    train_loss_history = []
+
+    # 訓練データに対する認識率の推移を格納する領域
+    train_acc_history = []
+
+    # テストデータに対する認識率の推移を格納する領域
+    test_acc_history = []
 
     # 訓練データの母数を取得 ... mnistは6万枚
     train_size = train_images.shape[0]
-
     # バッチサイズを定義
     batch_size = 100
 
-    # 学習率を定義
-    learning_rate = 0.1
-
-    # 損失関数の推移を格納する領域
-    train_loss_list = []
-
-    # 訓練データに対する認識率の推移を格納する領域
-    train_acc_list = []
-
-    # テストデータに対する認識率の推移を格納する領域
-    test_acc_list = []
-
+    # 訓練データをバッチサイズで分割した際の分割数を求める
     iter_per_epoch = max(train_size / batch_size, 1)
 
+    iters_num = 5000  # 繰り返しの回数を適宜設定する
     for i in range(iters_num):
 
-        # 毎回６万枚の訓練データから、ランダムに100枚のデータを抜き出す
+        # -----------------------
+        # バッチデータの作成
+        # -----------------------
+        # 毎回6万枚の訓練データから、ランダムに100枚のデータを抜き出す
         batch_mask = np.random.choice(train_size, batch_size)
 
         # バッチ用の訓練画像データを取得
-        x_batch = train_images[batch_mask]
+        x_batch_train = train_images[batch_mask]
 
-        # バッチ用の正解ラベルを取得
-        t_batch = train_labels[batch_mask]
+        # バッチ用の訓練ラベルを取得
+        t_batch_train = train_labels[batch_mask]
 
-        # バッチサイズで勾配を求める
-        # grad = network.numerical_gradient(x_batch, t_batch)
-        grad = network.gradient(x_batch, t_batch)
+        # -----------------------------------------
+        # バッチサイズで、訓練として、勾配を求める
+        # -----------------------------------------
+        # grad = network.numerical_gradient(x_batch_train, t_batch_train)
+        gradient_params = network.gradient(x_batch_train, t_batch_train)
 
-        # ニューラルネットワークの各種パラメータを更新する
+        # [学習] ニューラルネットワークの各種パラメータを更新する 
         for key in ('W1', 'b1', 'W2', 'b2'):
-            network.params[key] -= learning_rate * grad[key]
+            # 学習率(0.1) を考慮して、ニューラルネットワークのパラメータを更新する
+            network.params[key] -= 0.1 * gradient_params[key]
 
-        # 損失関数の値を求める
-        loss = network.loss(x_batch, t_batch)
+        # [評価用] 損失関数の値を求める
+        loss = network.loss(x_batch_train, t_batch_train)
 
-        # 損失関数の推移をリストに保存する
-        train_loss_list.append(loss)
+        # [評価用] 損失関数の推移をリストに保存する
+        train_loss_history.append(loss)
 
+        # 定期的に、学習したニューラルネットワークの精度の履歴を取る
         if i % iter_per_epoch == 0:
-            # 訓練データの分母と、バッチサイズから分割した回数ごとに、ニューラルネットワークの精度を求める
+            save_accuracy_log(train_images,
+                              train_labels,
+                              test_images,
+                              test_labels,
+                              network,
+                              train_acc_history,
+                              test_acc_history)
 
-            # 訓練データに対する、ニューラルネットワークの精度を求める
-            train_acc = network.accuracy(train_images, train_labels)
-
-            # テストデータに対する、ニューラルネットワークの精度を求める
-            test_acc = network.accuracy(test_images, test_labels)
-
-            train_acc_list.append(train_acc)
-            test_acc_list.append(test_acc)
-
-            print("train acc, test acc | ", train_acc, test_acc)
-
+    # -------------------------------
     # 損失関数の推移グラフの描画
-    x = np.arange(len(train_loss_list))
+    # -------------------------------
+    # x = np.arange(len(train_loss_history))
+    #
+    # plt.plot(x, train_loss_history, label='nural network loss')
+    #
+    # plt.xlabel("iteration")
+    # plt.ylabel("nural network loss")
+    # plt.ylim(0, 2.5)
+    #
+    # # 右下説明ラベルを表示する
+    # plt.legend(loc='upper right')
+    #
+    # plt.show()
 
-    plt.plot(x, train_loss_list, label='nural network loss', linestyle='solid')
-
-    plt.xlabel("iteration")
-    plt.ylabel("nural network loss")
-    plt.ylim(0, 4.0)
-
-    # 右下説明ラベルを表示する
-    plt.legend(loc='upper right')
-
-    plt.show()
-
+    # -------------------------------
     # 認識率推移グラフの描画
-    x = np.arange(len(train_acc_list))
+    # -------------------------------
+    x = np.arange(len(train_acc_history))
 
-    plt.plot(x, train_acc_list, label='nural network train acc')
-    plt.plot(x, test_acc_list, label='nural network test acc', linestyle='--')
+    plt.plot(x, train_acc_history, label='nural network train acc')
+    plt.plot(x, test_acc_history, label='nural network test acc', linestyle='--')
 
     plt.xlabel("nural network epochs")
     plt.ylabel("nural network accuracy")
@@ -340,7 +378,7 @@ def main():
     plt.legend(loc='center right')
 
     plt.show()
-    pass
+
 
 if __name__ == '__main__':
     # main()
