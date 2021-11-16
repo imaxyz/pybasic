@@ -128,7 +128,8 @@ class Affine:
 
 class SoftmaxWithLoss:
     """
-    Softmax-with-Lossレイヤ
+    Softmax-with-Lossレイヤ。
+    Softmax関数と、交差エントロピー誤差を含む。
     """
 
     def __init__(self):
@@ -137,12 +138,12 @@ class SoftmaxWithLoss:
         self.t = None  # 教師データ
 
     def _softmax(self, x):
-        """Softmax関数"""
+        """Softmax関数 (3.5.2章を参照)"""
         x = x - np.max(x, axis=-1, keepdims=True)  # オーバーフロー対策
         return np.exp(x) / np.sum(np.exp(x), axis=-1, keepdims=True)
 
     def _cross_entropy_error(self, y, t):
-        """クロスエントロピー誤差"""
+        """クロスエントロピー誤差。(4.2.4章を参照)"""
         if y.ndim == 1:
             t = t.reshape(1, t.size)
             y = y.reshape(1, y.size)
@@ -155,19 +156,38 @@ class SoftmaxWithLoss:
         return -np.sum(np.log(y[np.arange(batch_size), t] + 1e-7)) / batch_size
 
     def forward(self, x, t):
+        """順伝播"""
+
+        # 教師データを取得
         self.t = t
+
+        # ソフトマックス関数の出力を取得
         self.y = self._softmax(x)
+
+        # 損失を取得
         self.loss = self._cross_entropy_error(self.y, self.t)
 
+        # 損失を返す
         return self.loss
 
     def backward(self, dout=1):
+        """逆伝播"""
+
+        # バッチサイズを取得
         batch_size = self.t.shape[0]
+
         if self.t.size == self.y.size:  # 教師データがone-hot-vectorの場合
+            # 逆伝搬の計算
+            # 伝播する値を、バッチ個数で割ることで、平均化した誤差を前レイヤに伝播する
             dx = (self.y - self.t) / batch_size
         else:
+            # 逆伝搬の計算
             dx = self.y.copy()
+
+            # TODO: この計算の意味を確認
             dx[np.arange(batch_size), self.t] -= 1
+
+            # 伝播する値を、バッチ個数で割ることで、平均化した誤差を前レイヤに伝播する
             dx = dx / batch_size
 
         return dx
