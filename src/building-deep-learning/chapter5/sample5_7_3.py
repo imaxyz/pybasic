@@ -4,6 +4,10 @@ import numpy as np
 
 
 def main():
+
+    # 2層のニューラルネットワークを生成
+    network = TwoLayerNet(input_size=784, hidden_size=50, output_size=10)
+
     # データの読み込み
     (x_train, t_train), (x_test, t_test) = load_mnist(
         # 画像ピクセル値を0〜1.0に正規化する
@@ -12,8 +16,6 @@ def main():
         one_hot_label=True
     )
 
-    # 2層のニューラルネットワークを生成
-    network = TwoLayerNet(input_size=784, hidden_size=50, output_size=10)
 
     # 訓練データの一部を取得（リストの最初から3番目まで）
     x_batch = x_train[:3]
