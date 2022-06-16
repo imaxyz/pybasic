@@ -15,7 +15,7 @@ class SGD:
         # 学習係数をインスタンスとして保持する
         self.lr = lr
 
-    def update_params(self, params: dict, grads: dict):
+    def update(self, params: dict, grads: dict):
         """
         SGDでは、このupdateメソッドを繰り返し実行する。
 

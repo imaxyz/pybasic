@@ -11,3 +11,4 @@ src/building-deep-learning/chapter3/__pycache__
 *.pkl
 src/building-deep-learning/chapter4/__pycache__
 src/building-deep-learning/chapter5/__pycache__
+*.pyc
